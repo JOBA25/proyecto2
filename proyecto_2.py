@@ -139,19 +139,62 @@ class Cliente:
         
 
 
+class Invitado:
+    def __init__(self,cliente,id_invitado):
+        self.cliente = cliente
+        self.id_invitado = id_invitado
+        self.leerMenu()
+        self.decidirOrden()
 
+    def leerMenu(self)
+        print("El invitado {} del cliente {} leé el menu".format(self.id_invitado,self.cliente.id_cliente))
+        espera = random.randrange(1,5)
+        for i in range(espera):
+            pass
 
+    def decidirOrden(self):
+        self.cliente.mutex_orden.acquire()
+        #mensaje 
+        #tiempo espera
+        self.cliente.cuenta_orden += 1
+        self.cliente.mutex_orden.release()
+        self.cliente.lista_invitados.append(self)
 
-
-
-
-
-
-
-class invitado:
+    def comer(self):
+        #t espera
+        self.cliente.mutex_comer.acquire()
+        #mensaje de que termino
+        self.cliente.barrera_comer += 1
+        self.cliente.mutex_comer.release()
 
 
 class Mesero:
+    def __init__(self, id_mesero):
+        self.id_mesero = id_mesero
+        self.descansar = threading.Semaphore(0)
+
+    def enlistar(self):
+        global meserosDisponibles
+        mutex_meseros_disp.acquire()
+        meserosDisponibles.append(self)
+        mutex_meseros_disp.release()
+
+    def activar(self, peticion, id_cliente):
+        global mutex_meseros_disp, meserosDisponibles
+        self.descansar.release()
+
+        #
+        #
+        #puede ir in else if con las peticiones que se le pueden hacer
+        #"mesa"
+        #"menu"
+        #"orden"
+        #"cuenta"
+
+
+
+
+
 
 
 
