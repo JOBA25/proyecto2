@@ -264,3 +264,16 @@ class Chef:
 
 
 class Restaurante:
+    def __init__(self, num_meseros, num_chefs, num_clientes):
+        for i in range(num_chefs):
+            threading.Thread(target= Chef, args=[i]).start()
+
+        for i in range(num_meseros):
+            threading.Thread(target= Mesero, args=[i]).start()
+
+        for i in range(num_clientes):
+            num_invitados = random.randrange(1,5)
+            mutex_fila_espera.acquire()
+            clientesEnEspera.append( threading.Thread(target= Cliente, args=[i, num_invitados]).start())
+            mutex_fila_espera.release()
+
