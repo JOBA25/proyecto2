@@ -1,14 +1,92 @@
 import threading
 import random
+from tkinter import *
+raiz=Tk()
 
 #####################Variables globales########################
 
 #meseros, chefs, mesas, clientes
-num_meseros
-num_mesas
-num_chefs
-num_clientes
+meseros=StringVar()
+mesas=StringVar()
+chefs=StringVar()
+clientes=StringVar()
+num_meseros=0
+num_mesas=0
+num_chefs=0
+num_clientes=0
 
+
+
+
+#############################################################
+def envioDatos():
+    global num_clientes, num_chefs, num_mesas, num_meseros
+    print("Numero meseros"+str(meseros.get()))
+    print("Numero mesas"+str(mesas.get()))
+    print("Numero chefs" +str(chefs.get()))
+    print("Numero clientes"+str(clientes.get()))
+
+    try:
+    	num_meseros=int(meseros.get())
+    	num_mesas=int(mesas.get())
+    	num_chefs=int(chefs.get())
+    	num_clientes=int(clientes.get())
+    except ValueError:
+    	print("Valores incorrectos")
+
+
+"""Parametros iniciales para la ventana"""
+raiz.title("Le Restaurante")
+raiz.resizable(False, False)
+raiz.geometry("650x450")
+raiz.config(bg="beige")
+
+Label(raiz,text="Bienvenido al \"Le Restaurant\"",bg="White",font=("Imprint MT Shadow",20)).place(x=175,y=30)
+
+#Creación de frame para la ventana
+Frame1=Frame()
+Frame1.pack(side="left",anchor ="w")
+Frame1.config(bg="Red")
+Frame1.config(bd=10)
+Frame1.config(relief="groove")
+Frame1.config(width="320", height="250")
+
+Frame2=Frame()
+Frame2.pack(side="right", anchor="e")
+Frame2.config(bg="Green")
+Frame2.config(bd=10)
+Frame2.config(relief="groove")
+Frame2.config(width="350", height="250")
+
+
+
+#Texto de las ventanas del Frame de información
+Label(Frame1,text="Ingrese las cantidades correspondientes",bg="Red", font=("Imprint MT Shadow",12)).place(x=10,y=10)
+Label(Frame1,text="Numero de Meseros: ", bg="Red").place(x=10,y=35)
+Label(Frame1,text="Numero de Mesas: ", bg="Red").place(x=10,y=65)
+Label(Frame1,text="Numero de Chefs:", bg="Red").place(x=10,y=95)
+Label(Frame1,text="Numero de Clientes", bg="Red").place(x=10,y=125)
+Entry(Frame1,textvariable=meseros).place(x=125,y=35)
+Entry(Frame1,textvariable=mesas).place(x=125,y=65)
+Entry(Frame1,textvariable=chefs).place(x=125,y=95)
+Entry(Frame1,textvariable=clientes).place(x=125,y=125)
+
+"""Boton de envio de datos"""
+Button(Frame1,text="Envio",width=7,command=lambda:envioDatos()).place(x=100,y=155)
+
+
+
+Label(Frame2,text="Registro de actividades", bg="Green", font=("Imprint MT Shadow",12)).grid(row=0,column=0)
+action=Text(Frame2,width=30,height=12)
+action.grid(row=1,column=0,padx=10,pady=10)
+
+scrollVert=Scrollbar(Frame2,command=action.yview)
+scrollVert.grid(row=1,column=1,sticky="nsew")
+action.config(yscrollcommand=scrollVert.set)
+
+raiz.mainloop()
+
+#####################Clases######################################
 ###########listas
 meserosDisponibles = []
 clientesEnEspera = [] 
@@ -25,10 +103,6 @@ meseros = threading.Semaphore(num_meseros)
 mesas = threading.Semaphore(num_mesas)
 
 
-
-
-
-#####################Clases######################################
 class Cliente:
     def __init__(self, id_cliente, num_invitados):
         self.id_cliente = id_cliente
@@ -68,7 +142,7 @@ class Cliente:
         mesas.release()
     
     def llamarInvitado(self,i):
-        return threading.Thread(target = Cliente.Invitado, args=[self, i]).start()
+        return threading.Thread(target = Invitado, args=[self, i]).start()
 
     def llamarMesero(self, peticion):
         global meserosDisponibles, meseros, mutex_meseros_disp
@@ -115,11 +189,12 @@ class Cliente:
             
         print("todos en la mesa del cliente {} estan listos para ordenar".format(self.id_cliente))
         self.mutex_orden.acquire()
-        self.mutex_orden.acquire()
+        self.mutex_orden.release()
 
 
     def comer(self):
-        hilos = self.num_invitados + 1
+        # + 1
+        hilos = self.num_invitados
         acabar = True
         espera = random.randrange(1,5)
         for i in range(espera):
@@ -132,6 +207,7 @@ class Cliente:
         while acabar:
             if self.cuenta_comer == hilos:
                 self.barrera_comer.release()
+                acabar = False
         self.barrera_comer.acquire()
         self.barrera_comer.release()
 
@@ -150,8 +226,9 @@ class Invitado:
         self.id_invitado = id_invitado
         self.leerMenu()
         self.decidirOrden()
+        
 
-    def leerMenu(self)
+    def leerMenu(self):
         print("El invitado {} del cliente {} leé el menu".format(self.id_invitado,self.cliente.id_cliente))
         espera = random.randrange(1,5)
         for i in range(espera):
@@ -159,7 +236,8 @@ class Invitado:
 
     def decidirOrden(self):
         self.cliente.mutex_orden.acquire()
-        #mensaje 
+        print("El invitado {} del cliente {} ha elegido su platillo".format(self.id_invitado,self.cliente.id_cliente))
+
         #tiempo espera
         self.cliente.cuenta_orden += 1
         self.cliente.mutex_orden.release()
@@ -168,8 +246,9 @@ class Invitado:
     def comer(self):
         #t espera
         self.cliente.mutex_comer.acquire()
-        #mensaje de que termino
-        self.cliente.barrera_comer += 1
+        print("El invitado {} del cliente {} ha terminado de comer".format(self.id_invitado,self.cliente.id_cliente))
+        #*
+        self.cliente.cuenta_comer += 1
         self.cliente.mutex_comer.release()
 
 
@@ -186,11 +265,11 @@ class Mesero:
         meserosDisponibles.append(self)
         mutex_meseros_disp.release()
 
-    def activar(self, peticion, id_cliente, cliente, cliente):
+    def activar(self, peticion, id_cliente, cliente):
         global mutex_meseros_disp, meserosDisponibles
-        self.descansar.release()
+        #self.descansar.release()
 
-       if peticion == "mesa":
+        if peticion == "mesa":
              self.llevarMesa(id_cliente)
         elif peticion == "menu":
              self.mostrarMenu(id_cliente)
@@ -202,7 +281,7 @@ class Mesero:
              self.traerCuenta(id_cliente)
 
         print("El mesero {} ya se encuentra libre".format(self.id_mesero))
-        self.enlistar
+        self.enlistar()
 
     def llevarMesa(self, id_cliente):
         print("Yo, el mesero {}, llevare al cliente {} a su mesa".format(self.id_mesero,id_cliente))
@@ -228,7 +307,7 @@ class Mesero:
         print("Yo, el mesero {}, llevo la orden lista del cliente {} ".format(self.id_mesero,id_cliente))
         cliente.esperarComida = False
 
-    def traerCuenta(self, id_cliente)
+    def traerCuenta(self, id_cliente):
         print("Yo, el mesero {}, llevo la cuenta en la mesa del cliente {} ".format(self.id_mesero,id_cliente))
 
 
@@ -276,4 +355,7 @@ class Restaurante:
             mutex_fila_espera.acquire()
             clientesEnEspera.append( threading.Thread(target= Cliente, args=[i, num_invitados]).start())
             mutex_fila_espera.release()
-
+            
+if __name__ == '__main__':
+    restaurante = Restaurante(num_meseros,num_chefs,num_clientes)
+    
