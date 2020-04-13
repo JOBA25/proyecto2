@@ -6,85 +6,16 @@ raiz=Tk()
 #####################Variables globales########################
 
 #meseros, chefs, mesas, clientes
-meseros=StringVar()
-mesas=StringVar()
-chefs=StringVar()
-clientes=StringVar()
+meserosSTR=StringVar()
+mesasSTR=StringVar()
+chefsSTR=StringVar()
+clientesSTR=StringVar()
 num_meseros=0
 num_mesas=0
 num_chefs=0
 num_clientes=0
 
 
-
-
-#############################################################
-def envioDatos():
-    global num_clientes, num_chefs, num_mesas, num_meseros
-    print("Numero meseros"+str(meseros.get()))
-    print("Numero mesas"+str(mesas.get()))
-    print("Numero chefs" +str(chefs.get()))
-    print("Numero clientes"+str(clientes.get()))
-
-    try:
-    	num_meseros=int(meseros.get())
-    	num_mesas=int(mesas.get())
-    	num_chefs=int(chefs.get())
-    	num_clientes=int(clientes.get())
-    except ValueError:
-    	print("Valores incorrectos")
-
-
-"""Parametros iniciales para la ventana"""
-raiz.title("Le Restaurante")
-raiz.resizable(False, False)
-raiz.geometry("650x450")
-raiz.config(bg="beige")
-
-Label(raiz,text="Bienvenido al \"Le Restaurant\"",bg="White",font=("Imprint MT Shadow",20)).place(x=175,y=30)
-
-#Creación de frame para la ventana
-Frame1=Frame()
-Frame1.pack(side="left",anchor ="w")
-Frame1.config(bg="Red")
-Frame1.config(bd=10)
-Frame1.config(relief="groove")
-Frame1.config(width="320", height="250")
-
-Frame2=Frame()
-Frame2.pack(side="right", anchor="e")
-Frame2.config(bg="Green")
-Frame2.config(bd=10)
-Frame2.config(relief="groove")
-Frame2.config(width="350", height="250")
-
-
-
-#Texto de las ventanas del Frame de información
-Label(Frame1,text="Ingrese las cantidades correspondientes",bg="Red", font=("Imprint MT Shadow",12)).place(x=10,y=10)
-Label(Frame1,text="Numero de Meseros: ", bg="Red").place(x=10,y=35)
-Label(Frame1,text="Numero de Mesas: ", bg="Red").place(x=10,y=65)
-Label(Frame1,text="Numero de Chefs:", bg="Red").place(x=10,y=95)
-Label(Frame1,text="Numero de Clientes", bg="Red").place(x=10,y=125)
-Entry(Frame1,textvariable=meseros).place(x=125,y=35)
-Entry(Frame1,textvariable=mesas).place(x=125,y=65)
-Entry(Frame1,textvariable=chefs).place(x=125,y=95)
-Entry(Frame1,textvariable=clientes).place(x=125,y=125)
-
-"""Boton de envio de datos"""
-Button(Frame1,text="Envio",width=7,command=lambda:envioDatos()).place(x=100,y=155)
-
-
-
-Label(Frame2,text="Registro de actividades", bg="Green", font=("Imprint MT Shadow",12)).grid(row=0,column=0)
-action=Text(Frame2,width=30,height=12)
-action.grid(row=1,column=0,padx=10,pady=10)
-
-scrollVert=Scrollbar(Frame2,command=action.yview)
-scrollVert.grid(row=1,column=1,sticky="nsew")
-action.config(yscrollcommand=scrollVert.set)
-
-raiz.mainloop()
 
 #####################Clases######################################
 ###########listas
@@ -103,6 +34,92 @@ meseros = threading.Semaphore(num_meseros)
 mesas = threading.Semaphore(num_mesas)
 
 
+
+#############################################################
+#Codigo de la interfaz
+#############################################################
+
+
+
+"""Parametros iniciales para la ventana"""
+raiz.title("Le Restaurante")
+raiz.resizable(False, False)
+raiz.geometry("850x650")
+raiz.config(bg="beige")
+
+Label(raiz,text="Bienvenido al \"Le Restaurant\"",bg="White",font=("Imprint MT Shadow",20)).place(x=300,y=30)
+
+#Creación de frame para la ventana
+Frame1=Frame()
+
+Frame1.config(bg="Red")
+Frame1.config(bd=10)
+Frame1.config(relief="groove")
+Frame1.config(width="340", height="250")
+Frame1.pack(side="left",anchor ="w")
+
+
+Frame2=Frame()
+Frame2.config(bg="Green")
+Frame2.config(bd=10)
+Frame2.config(relief="groove")
+Frame2.config(width="450", height="650")
+Frame2.pack(side="right", anchor="e")
+
+
+#Texto de las ventanas del Frame de información
+Label(Frame1,text="Ingrese las cantidades correspondientes",bg="Red", font=("Imprint MT Shadow",12)).place(x=10,y=10)
+Label(Frame1,text="Numero de Meseros: ", bg="Red").place(x=10,y=35)
+Label(Frame1,text="Numero de Mesas: ", bg="Red").place(x=10,y=65)
+Label(Frame1,text="Numero de Chefs:", bg="Red").place(x=10,y=95)
+Label(Frame1,text="Numero de Clientes", bg="Red").place(x=10,y=125)
+Entry(Frame1,textvariable=meserosSTR).place(x=125,y=35)
+Entry(Frame1,textvariable=mesasSTR).place(x=125,y=65)
+Entry(Frame1,textvariable=chefsSTR).place(x=125,y=95)
+Entry(Frame1,textvariable=clientesSTR).place(x=125,y=125)
+
+"""Boton de envio de datos"""
+Button(Frame1,text="Envio",width=7,command=lambda:envioDatos()).place(x=100,y=155)
+
+Label(Frame2,text="Registro de actividades", bg="Green", font=("Imprint MT Shadow",12)).grid(row=0,column=0)
+action=Text(Frame2,width=50,height=20)
+action.grid(row=1,column=0,padx=10,pady=10)
+
+scrollVert=Scrollbar(Frame2,command=action.yview)
+scrollVert.grid(row=1,column=1,sticky="nsew")
+action.config(yscrollcommand=scrollVert.set)
+#Funcion del boton que obtendrá los datos y los guardará en los datos globales
+
+def envioDatos():
+    global num_clientes, num_chefs, num_mesas, num_meseros, chefs, meseros, mesas
+    action.delete('1.0',END)
+    
+
+    try:
+        num_meseros=int(meserosSTR.get())
+        num_mesas=int(mesasSTR.get())
+        num_chefs=int(chefsSTR.get())
+        num_clientes=int(clientesSTR.get())
+        chefs = threading.Semaphore(num_chefs)
+        meseros = threading.Semaphore(num_meseros)
+        mesas = threading.Semaphore(num_mesas)
+    except ValueError:
+        action.insert(INSERT,"Valores incorrectos\n")
+    if(num_meseros>0 and num_mesas>0 and num_chefs>0 and num_clientes>0):
+        action.insert(INSERT,"ESTADO DEL RESTAURANTE\n")
+        action.insert(INSERT,"\tNumero meseros: {} \n".format(str(meserosSTR.get())))
+        action.insert(INSERT,"\tNumero mesas: {} \n".format(str(mesasSTR.get())))
+        action.insert(INSERT,"\tNumero chefs: {} \n".format(str(chefsSTR.get())))
+        action.insert(INSERT,"\tNumero clientes: {} \n".format(str(clientesSTR.get())))
+        restaurante = Restaurante(num_meseros, num_chefs, num_clientes)
+
+    else:
+        action.insert(INSERT,"Valores incorrectos\n")
+
+    if(len(meserosDisponibles)==num_meseros-1 and len(clientesEnEspera)==0 and len(chefsDisponibles)==num_chefs-1):
+        action.insert(END,"El restaurante ha cerrado sus puertas. \nHASTA LUEGO :)\n")
+        print("El restaurante ha cerrado sus puertas. \nHASTA LUEGO :)\n")
+
 class Cliente:
     def __init__(self, id_cliente, num_invitados):
         self.id_cliente = id_cliente
@@ -117,7 +134,6 @@ class Cliente:
         self.cuenta_comer = 0
         self.mutex_comer = threading.Semaphore(1)
         self.barrera_comer = threading.Semaphore(0)
-
         self.esperarMesa()
 
     def esperarMesa(self):
@@ -127,14 +143,16 @@ class Cliente:
         mutex_fila_espera.acquire()
         clientesEnEspera.pop(0)
         mutex_fila_espera.release()
-
+        
+        #print("Cliente {} esta listo".format(self.id_cliente))
         self.llamarMesero("mesa")
         self.obtenerMesa()
         self.llamarMesero("menu")
         self.leerMenuYOrdenar()
         self.llamarMesero("orden")
         while self.esperarComida == True:
-            print("Yo, el cliente {}, estoy esperando nuestra orden".format(self.id_cliente))
+            action.insert(INSERT,"Cliente {} esperando nuestra orden\n".format(self.id_cliente))
+            
         self.comer()
         self.llamarMesero("cuenta")
         self.irse()
@@ -146,7 +164,7 @@ class Cliente:
 
     def llamarMesero(self, peticion):
         global meserosDisponibles, meseros, mutex_meseros_disp
-        print("el cliente {} tiene una petición".format(self.id_cliente))
+        action.insert(INSERT,"Cliente {} tiene una petición\n".format(self.id_cliente))
 
         #se pide un mesero, se saca de la lista de disponibles, se le da la peticion
         #al completar la acción el mesero regresa a estar disponible
@@ -158,17 +176,18 @@ class Cliente:
         meseros.release()
 
     def obtenerMesa(self):
-        print("Yo, el cliente {}, consegui una mesa para {} personas".format(self.id_cliente,self.num_invitados+1))
-
+        action.insert(INSERT,"<------Cliente {} consigue una mesa para {} personas\n".format(self.id_cliente,self.num_invitados+1))
+        
     def leerMenu(self):
-        print("Yo, el cliente {}, estoy escogiendo mi platillo".format(self.id_cliente))
+        action.insert(INSERT,"Cliente {} está escogiendo mi platillo\n".format(self.id_cliente))
+        
         espera = random.randrange(1,5)
         for i in range(espera):
             pass
 
     def decidirOrden(self):
         self.mutex_orden.acquire()
-        print("Yo, el cliente {}, ya decidí qué ordenar".format(self.id_cliente))
+        action.insert(INSERT,"Cliente {} decidío su orden\n".format(self.id_cliente))
         self.cuenta_orden += 1
         self.mutex_orden.release()
 
@@ -187,7 +206,7 @@ class Cliente:
                 self.barrera_orden.release()
                 acabar = False
             
-        print("todos en la mesa del cliente {} estan listos para ordenar".format(self.id_cliente))
+        action.insert(INSERT,"Todos en la mesa del cliente {} estan listos para ordenar\n".format(self.id_cliente))
         self.mutex_orden.acquire()
         self.mutex_orden.release()
 
@@ -199,7 +218,8 @@ class Cliente:
         espera = random.randrange(1,5)
         for i in range(espera):
             pass
-        print("El cliente {} ha terminado de comer".format(self.id_cliente))
+        action.insert(INSERT,"Cliente {} ha terminado de comer\n".format(self.id_cliente))
+        
         #Hagamos que los invitados coman tambien
         for i in self.lista_invitados:
             i.comer()
@@ -211,15 +231,14 @@ class Cliente:
         self.barrera_comer.acquire()
         self.barrera_comer.release()
 
-        print("todos en la mesa del cliente {} han terminado de comer".format(self.id_cliente))
+        action.insert(INSERT,"Todos en la mesa del cliente {} han terminado de comer\n".format(self.id_cliente))
         self.mutex_comer.acquire()
         self.mutex_comer.release()
 
     def irse(self):
-        print("El cliente {} y sus {} invitados han decidido irse".format(self.id_cliente,self.num_invitados))
-        
+        action.insert(INSERT,"----->Cliente {} y sus {} invitados han decidido irse\n".format(self.id_cliente,self.num_invitados))
 
-
+#Clase para los hilos que se encuentran enlazados con el cliente
 class Invitado:
     def __init__(self,cliente,id_invitado):
         self.cliente = cliente
@@ -229,15 +248,16 @@ class Invitado:
         
 
     def leerMenu(self):
-        print("El invitado {} del cliente {} leé el menu".format(self.id_invitado,self.cliente.id_cliente))
+        action.insert(INSERT,"El invitado {} del cliente {} leé el menu\n".format(self.id_invitado,self.cliente.id_cliente))
+        
         espera = random.randrange(1,5)
         for i in range(espera):
             pass
 
     def decidirOrden(self):
         self.cliente.mutex_orden.acquire()
-        print("El invitado {} del cliente {} ha elegido su platillo".format(self.id_invitado,self.cliente.id_cliente))
-
+        action.insert(INSERT,"El invitado {} del cliente {} ha elegido su platillo\n".format(self.id_invitado,self.cliente.id_cliente))
+        
         #tiempo espera
         self.cliente.cuenta_orden += 1
         self.cliente.mutex_orden.release()
@@ -246,12 +266,13 @@ class Invitado:
     def comer(self):
         #t espera
         self.cliente.mutex_comer.acquire()
-        print("El invitado {} del cliente {} ha terminado de comer".format(self.id_invitado,self.cliente.id_cliente))
+        action.insert(INSERT,"El invitado {} del cliente {} ha terminado de comer\n".format(self.id_invitado,self.cliente.id_cliente))
+        
         #*
         self.cliente.cuenta_comer += 1
         self.cliente.mutex_comer.release()
 
-
+#Clase para los hilos que actuarán como meseros
 class Mesero:
     def __init__(self, id_mesero):
         self.id_mesero = id_mesero
@@ -280,19 +301,19 @@ class Mesero:
         elif peticion == "cuenta":
              self.traerCuenta(id_cliente)
 
-        print("El mesero {} ya se encuentra libre".format(self.id_mesero))
+        action.insert(INSERT,"Mesero {} se encuentra libre\n".format(self.id_mesero))
         self.enlistar()
 
     def llevarMesa(self, id_cliente):
-        print("Yo, el mesero {}, llevare al cliente {} a su mesa".format(self.id_mesero,id_cliente))
-
+        action.insert(INSERT,"Mesero {} lleva a Cliente {} a su mesa\n".format(self.id_mesero,id_cliente))
+        
     def mostrarMenu(self, id_cliente):
-        print("Yo, el mesero {}, le he dado los Menus a todos en la mesa del cliente {} ".format(self.id_mesero,id_cliente))
-
+        action.insert(INSERT,"Mesero {} le ha dado los Menus a todos en la mesa del cliente {} \n".format(self.id_mesero,id_cliente))
+        
     def llevarOrdenAChef(self, id_cliente, cliente):
         global chefsDisponibles, chefs, mutex_chefs_disp
-        print("Yo, el mesero {}, he llevado la orden del cliente {} a preparar".format(self.id_mesero,id_cliente))
-
+        action.insert(INSERT,"Mesero {} llevó la orden del cliente {} a preparar\n".format(self.id_mesero,id_cliente))
+        
 
         #se pide un chef, se saca de la lista de disponibles
         #al completar la acción el chef regresa a estar disponible
@@ -304,30 +325,30 @@ class Mesero:
         chefs.release()
 
     def llevarOrdenAMesa(self, id_cliente, cliente):
-        print("Yo, el mesero {}, llevo la orden lista del cliente {} ".format(self.id_mesero,id_cliente))
+        action.insert(INSERT,"Mesero {} llevó la orden lista del cliente {} \n".format(self.id_mesero,id_cliente))
         cliente.esperarComida = False
 
     def traerCuenta(self, id_cliente):
-        print("Yo, el mesero {}, llevo la cuenta en la mesa del cliente {} ".format(self.id_mesero,id_cliente))
+        action.insert(INSERT,"Mesero {} llevó la cuenta en la mesa del cliente {} \n".format(self.id_mesero,id_cliente))
 
-
+#Entidad para los hilos que actuan como chefs
 class Chef:
     def __init__(self, id_chef):
         self.id_chef = id_chef
         self.enlistar()
-    
+    #Funcion para que el chef desocupado entre a la lista de chefs disponibles
     def enlistar(self):
         global chefsDisponibles
         mutex_chefs_disp.acquire()
         chefsDisponibles.append(self)
         mutex_chefs_disp.release()
-
+    #Funcion para la preparación del la orden del chef con una espera para terminar el platillo
     def cocinar(self, cliente):
-        print("Yo, el chef {}, preparo la orden del cliente {} ".format(self.id_chef,cliente.id_cliente))
+        action.insert(INSERT,"Chef {} preparó la orden del cliente {} \n".format(self.id_chef,cliente.id_cliente))
         espera = random.randrange(1,5)
         for i in range(espera):
             pass
-        print("Yo, el chef {}, termine la orden del cliente {} ".format(self.id_chef,cliente.id_cliente))
+        action.insert(INSERT,"Chef {} terminó la orden del cliente {} \n".format(self.id_chef,cliente.id_cliente))
         
         #busquemos un mesero que lleve la orden
         meseros.acquire()
@@ -337,25 +358,25 @@ class Chef:
         mesero.activar("ordenLista", cliente.id_cliente, cliente)
         meseros.release()
 
-        print("Yo, el chef {}, estoy libre, ire a dormir".format(self.id_chef))
+        action.insert(INSERT,"Chef {} está libre \n".format(self.id_chef))
         self.enlistar()
 
 
-
+#Entidad del restaurante, utilizado para la inicializacion de las variables y el manejo del proyecto
 class Restaurante:
     def __init__(self, num_meseros, num_chefs, num_clientes):
         for i in range(num_chefs):
             threading.Thread(target= Chef, args=[i]).start()
+        
 
         for i in range(num_meseros):
             threading.Thread(target= Mesero, args=[i]).start()
-
+       
         for i in range(num_clientes):
             num_invitados = random.randrange(1,5)
             mutex_fila_espera.acquire()
             clientesEnEspera.append( threading.Thread(target= Cliente, args=[i, num_invitados]).start())
             mutex_fila_espera.release()
-            
-if __name__ == '__main__':
-    restaurante = Restaurante(num_meseros,num_chefs,num_clientes)
-    
+        
+raiz.mainloop()
+
