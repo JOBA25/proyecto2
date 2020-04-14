@@ -1,3 +1,11 @@
+"""
+    Proyecto 2: Una situación cotidiana paralelizable
+    Alumnos:
+        Barcenas Avelas Jorge Octavio
+        Reza Chavarria Sergio Gabriel
+    Profesor:
+        Gunnar Eyal Wolf Iszaevich
+"""
 import threading
 import random
 from tkinter import *
@@ -49,9 +57,9 @@ raiz.config(bg="beige")
 
 Label(raiz,text="Bienvenido al \"Le Restaurant\"",bg="White",font=("Imprint MT Shadow",20)).place(x=300,y=30)
 
-#Creación de frame para la ventana
+#Creación de frame para la ventana, este frame será utilizado para resguardar los texto, cuadros de texto y boton para el ingreso de cantidades.
 Frame1=Frame()
-
+#Configuración del frame 1
 Frame1.config(bg="Red")
 Frame1.config(bd=10)
 Frame1.config(relief="groove")
@@ -59,6 +67,8 @@ Frame1.config(width="340", height="250")
 Frame1.pack(side="left",anchor ="w")
 
 
+
+#Creación y configuración del frame 2, el cual tiene el cuadro de texto para las acciones realizadas en el restaurante
 Frame2=Frame()
 Frame2.config(bg="Green")
 Frame2.config(bd=10)
@@ -73,6 +83,7 @@ Label(Frame1,text="Numero de Meseros: ", bg="Red").place(x=10,y=35)
 Label(Frame1,text="Numero de Mesas: ", bg="Red").place(x=10,y=65)
 Label(Frame1,text="Numero de Chefs:", bg="Red").place(x=10,y=95)
 Label(Frame1,text="Numero de Clientes", bg="Red").place(x=10,y=125)
+#Cuadros de texto para las entradas de los datos incluyendo las variables en las que serán guardados cada valor.
 Entry(Frame1,textvariable=meserosSTR).place(x=125,y=35)
 Entry(Frame1,textvariable=mesasSTR).place(x=125,y=65)
 Entry(Frame1,textvariable=chefsSTR).place(x=125,y=95)
@@ -81,13 +92,17 @@ Entry(Frame1,textvariable=clientesSTR).place(x=125,y=125)
 """Boton de envio de datos"""
 Button(Frame1,text="Envio",width=7,command=lambda:envioDatos()).place(x=100,y=155)
 
+#Cuadro de texto del frame 2, el cual tiene la información que registran los procesos
 Label(Frame2,text="Registro de actividades", bg="Green", font=("Imprint MT Shadow",12)).grid(row=0,column=0)
 action=Text(Frame2,width=50,height=20)
 action.grid(row=1,column=0,padx=10,pady=10)
-
+#Barra de Scroll para el cuadro de texto del registro de la información, esto para mejor manejo de la visualización
 scrollVert=Scrollbar(Frame2,command=action.yview)
 scrollVert.grid(row=1,column=1,sticky="nsew")
 action.config(yscrollcommand=scrollVert.set)
+
+
+
 #Funcion del boton que obtendrá los datos y los guardará en los datos globales
 
 def envioDatos():
@@ -116,9 +131,13 @@ def envioDatos():
     else:
         action.insert(INSERT,"Valores incorrectos\n")
 
-    if(len(meserosDisponibles)==num_meseros-1 and len(clientesEnEspera)==0 and len(chefsDisponibles)==num_chefs-1):
-        action.insert(END,"El restaurante ha cerrado sus puertas. \nHASTA LUEGO :)\n")
-        print("El restaurante ha cerrado sus puertas. \nHASTA LUEGO :)\n")
+   
+
+
+
+#######################################################################
+#Código de las entidades del restaurante
+###################################################################### 
 
 class Cliente:
     def __init__(self, id_cliente, num_invitados):
@@ -159,6 +178,7 @@ class Cliente:
 
         mesas.release()
     
+    #Acciones de interaccion del cliente con los invitados y al mesero
     def llamarInvitado(self,i):
         return threading.Thread(target = Invitado, args=[self, i]).start()
 
@@ -246,7 +266,7 @@ class Invitado:
         self.leerMenu()
         self.decidirOrden()
         
-
+    #Acciones que realiza el invitado, siendo parecidas al del cliente
     def leerMenu(self):
         action.insert(INSERT,"El invitado {} del cliente {} leé el menu\n".format(self.id_invitado,self.cliente.id_cliente))
         
@@ -286,6 +306,7 @@ class Mesero:
         meserosDisponibles.append(self)
         mutex_meseros_disp.release()
 
+    #Dependiendo del cliente, el mesero realizará diferentes acciones
     def activar(self, peticion, id_cliente, cliente):
         global mutex_meseros_disp, meserosDisponibles
         #self.descansar.release()
@@ -377,6 +398,12 @@ class Restaurante:
             mutex_fila_espera.acquire()
             clientesEnEspera.append( threading.Thread(target= Cliente, args=[i, num_invitados]).start())
             mutex_fila_espera.release()
-        
+        if(len(meserosDisponibles)==num_meseros and len(clientesEnEspera)==0 and len(chefsDisponibles)==num_chefs):
+            action.insert(END,"El restaurante ha cerrado sus puertas. \nHASTA LUEGO :)\n")
+            print("El restaurante ha cerrado sus puertas. \nHASTA LUEGO :)\n")
+
+
+
+#Función para la aparición del la pantalla de la interfaz
 raiz.mainloop()
 
